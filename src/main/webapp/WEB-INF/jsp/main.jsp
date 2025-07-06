@@ -5,7 +5,8 @@
 </head>
 <body>
 <h1>🎉 로그인 성공!</h1>
-<p>환영합니다, ${username}님!</p>
+<p>닉네임: ${member.nickName}</p>
+<p>이메일: ${member.email}</p>
 <a href="/logout" style="color: red; font-weight: bold;">🔒 로그아웃</a>
 
 </body>

@@ -27,14 +27,20 @@ public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("🛰️ loadUser() 진입");
+
         OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(userRequest);
         Map<String, Object> attributes = oauth2User.getAttributes();
 
         String githubId = attributes.get("id").toString();
         String username = (String) attributes.get("login");
 
+        System.out.println("🔍 GitHub ID: " + githubId);
+        System.out.println("🔍 GitHub 로그인명: " + username);
+
         // 👇 이메일을 추가 요청으로 안전하게 가져옴
         String email = fetchPrimaryEmail(userRequest);
+        System.out.println("📧 가져온 이메일: " + email);
 
         memberService.processOAuthPostLogin(githubId, username, email);
 
@@ -46,6 +52,8 @@ public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private String fetchPrimaryEmail(OAuth2UserRequest userRequest) {
+        System.out.println("🌐 fetchPrimaryEmail() 호출됨");
+
         String accessToken = userRequest.getAccessToken().getTokenValue();
         String emailApiUrl = "https://api.github.com/user/emails";
 
@@ -62,16 +70,28 @@ public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 new ParameterizedTypeReference<>() {}
         );
 
+        System.out.println("📡 이메일 API 응답 상태: " + response.getStatusCode());
+
         if (response.getStatusCode() == HttpStatus.OK) {
-            for (Map<String, Object> emailEntry : response.getBody()) {
+            List<Map<String, Object>> emails = response.getBody();
+            System.out.println("📨 이메일 리스트: " + emails);
+
+            for (Map<String, Object> emailEntry : emails) {
                 Boolean primary = (Boolean) emailEntry.get("primary");
                 Boolean verified = (Boolean) emailEntry.get("verified");
+                String email = (String) emailEntry.get("email");
+
+                System.out.println("🔹 email: " + email + ", primary: " + primary + ", verified: " + verified);
+
                 if (primary != null && primary && verified != null && verified) {
-                    return (String) emailEntry.get("email");
+                    System.out.println("✅ primary & verified 이메일 선택됨: " + email);
+                    return email;
                 }
             }
         }
 
-        return null; // 못 찾으면 null
+        System.out.println("⚠️ 이메일을 가져오지 못했습니다.");
+        return null;
     }
 }
+
