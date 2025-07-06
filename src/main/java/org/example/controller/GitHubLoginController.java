@@ -19,13 +19,13 @@ public class GitHubLoginController {
                 "?client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
                 "&scope=user:email" +
-                "&prompt=login"; // ✅ 로그인 창 무조건 뜨게 함
+                "&prompt=login";
 
         return "redirect:" + githubAuthUrl;
     }
 
     @GetMapping("/logout-success")
     public String logoutSuccess() {
-        return "redirect:/"; // 로그아웃 후 홈 또는 로그인 페이지로
+        return "redirect:/";
     }
 }

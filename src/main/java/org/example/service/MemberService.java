@@ -15,7 +15,7 @@ public class MemberService {
         System.out.println("📥 processOAuthPostLogin() 진입");
         System.out.println("➡️ oauthId: " + oauthId + ", username: " + username + ", email: " + email);
 
-        Member existing = memberRepository.findByOauthId(oauthId);
+        Member existing = memberRepository.getByOauthId(oauthId);
         System.out.println("🔎 기존 회원 조회 결과: " + existing);
 
         if (existing == null) {
@@ -34,7 +34,7 @@ public class MemberService {
     }
 
 
-    public Member findByOauthId(String oauthId) {
-        return memberRepository.findByOauthId(oauthId);
+    public Member getByOauthId(String oauthId) {
+        return memberRepository.getByOauthId(oauthId);
     }
 }

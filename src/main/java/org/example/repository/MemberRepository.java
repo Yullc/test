@@ -6,6 +6,6 @@ import org.example.vo.Member;
 
 @Mapper
 public interface MemberRepository {
-    Member findByOauthId(String oauthId);
+    Member getByOauthId(String oauthId);
     void save(Member member);
 }
