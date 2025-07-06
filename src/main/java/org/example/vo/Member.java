@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Member {
     private int id;
-    private String githubId;
+    private String oauthId;
     private String nickName;
     private String email;
 }

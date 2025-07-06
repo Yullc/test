@@ -6,6 +6,6 @@ import org.example.vo.Member;
 
 @Mapper
 public interface MemberRepository {
-    Member findByGithubId(String githubId);
+    Member findByOauthId(String oauthId);
     void save(Member member);
 }

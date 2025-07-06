@@ -15,6 +15,14 @@
              alt="GitHub Logo" class="w-6 h-6">
         <span>GitHub로 로그인</span>
     </a>
+
+    <a href="/oauth2/authorization/google"
+       class="bg-red-500 text-white text-center py-2 rounded block hover:bg-red-600 mt-4">
+        <img src="https://developers.google.com/identity/images/g-logo.png"
+             alt="Google Logo" class="inline w-5 h-5 mr-2">
+        Google로 로그인
+    </a>
+
 </div>
 </body>
 </html>

@@ -18,9 +18,9 @@ public class MainController {
 
     @GetMapping("/main")
     public String mainPage(Principal principal, Model model) {
-        String githubId = principal.getName(); // 로그인한 GitHub 아이디
+        String oauthId = principal.getName(); // 로그인한 GitHub 아이디
 
-        Member member = memberService.findByGithubId(githubId); // 하나만 가져오기
+        Member member = memberService.findByOauthId(oauthId); // 하나만 가져오기
 
         model.addAttribute("member", member); // JSP에서 member.nickName, member.email 사용 가능
 

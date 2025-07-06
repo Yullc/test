@@ -11,16 +11,16 @@ public class MemberService {
     @Autowired
     private MemberRepository memberRepository;
 
-    public void processOAuthPostLogin(String githubId, String username, String email) {
+    public void processOAuthPostLogin(String oauthId, String username, String email) {
         System.out.println("📥 processOAuthPostLogin() 진입");
-        System.out.println("➡️ githubId: " + githubId + ", username: " + username + ", email: " + email);
+        System.out.println("➡️ oauthId: " + oauthId + ", username: " + username + ", email: " + email);
 
-        Member existing = memberRepository.findByGithubId(githubId);
+        Member existing = memberRepository.findByOauthId(oauthId);
         System.out.println("🔎 기존 회원 조회 결과: " + existing);
 
         if (existing == null) {
             Member newMember = Member.builder()
-                    .githubId(githubId)
+                    .oauthId(oauthId)
                     .nickName(username)
                     .email(email)
                     .build();
@@ -34,7 +34,7 @@ public class MemberService {
     }
 
 
-    public Member findByGithubId(String githubId) {
-        return memberRepository.findByGithubId(githubId);
+    public Member findByOauthId(String oauthId) {
+        return memberRepository.findByOauthId(oauthId);
     }
 }

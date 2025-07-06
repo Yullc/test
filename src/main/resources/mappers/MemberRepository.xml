@@ -5,14 +5,13 @@
 
 <mapper namespace="org.example.repository.MemberRepository">
 
-    <select id="findByGithubId" resultType="org.example.vo.Member">
-        SELECT * FROM member WHERE githubId = #{githubId}
+    <select id="findByOauthId" resultType="org.example.vo.Member">
+        SELECT * FROM member WHERE oauthId = #{oauthId}
     </select>
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO member (githubId, nickName, email)
-        VALUES (#{githubId}, #{nickName}, #{email})
+        INSERT INTO member (oauthId, nickName, email)
+        VALUES (#{oauthId}, #{nickName}, #{email})
     </insert>
-
 </mapper>
 

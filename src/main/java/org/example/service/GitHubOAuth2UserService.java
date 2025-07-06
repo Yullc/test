@@ -5,12 +5,10 @@ import org.example.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,37 +18,42 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+public class GitHubOAuth2UserService extends DefaultOAuth2UserService
+        implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     @Autowired
     private MemberService memberService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("🛰️ loadUser() 진입");
+        // ✅ super.loadUser() 호출 가능해짐
+        OAuth2User oAuth2User = super.loadUser(userRequest);
+        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // github 또는 google
 
-        OAuth2User oauth2User = new DefaultOAuth2UserService().loadUser(userRequest);
-        Map<String, Object> attributes = oauth2User.getAttributes();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        String oauthId = null;
+        String nickName = null;
+        String email = null;
 
-        String githubId = attributes.get("id").toString();
-        String username = (String) attributes.get("login");
+        if ("github".equals(registrationId)) {
+            oauthId = attributes.get("id").toString();
+            nickName = (String) attributes.get("login");
+            email = fetchPrimaryEmail(userRequest); // GitHub는 별도 호출
+        } else if ("google".equals(registrationId)) {
+            oauthId = attributes.get("sub").toString();
+            nickName = (String) attributes.get("name");
+            email = (String) attributes.get("email");
+        } else {
+            throw new OAuth2AuthenticationException("Unsupported provider: " + registrationId);
+        }
 
-        System.out.println("🔍 GitHub ID: " + githubId);
-        System.out.println("🔍 GitHub 로그인명: " + username);
+        // 🔧 사용자 정보를 DB에 저장 또는 조회
+        memberService.processOAuthPostLogin(oauthId, nickName, email);
 
-        // 👇 이메일을 추가 요청으로 안전하게 가져옴
-        String email = fetchPrimaryEmail(userRequest);
-        System.out.println("📧 가져온 이메일: " + email);
-
-        memberService.processOAuthPostLogin(githubId, username, email);
-
-        return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                attributes,
-                "id"
-        );
+        return oAuth2User;
     }
 
+    // 📡 GitHub 사용자 이메일 추가 요청
     private String fetchPrimaryEmail(OAuth2UserRequest userRequest) {
         System.out.println("🌐 fetchPrimaryEmail() 호출됨");
 
@@ -83,7 +86,7 @@ public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
                 System.out.println("🔹 email: " + email + ", primary: " + primary + ", verified: " + verified);
 
-                if (primary != null && primary && verified != null && verified) {
+                if (Boolean.TRUE.equals(primary) && Boolean.TRUE.equals(verified)) {
                     System.out.println("✅ primary & verified 이메일 선택됨: " + email);
                     return email;
                 }
@@ -94,4 +97,3 @@ public class GitHubOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return null;
     }
 }
-

@@ -23,16 +23,30 @@ spring:
       client:
         registration:
           github:
-            client-id: Ov23li4CgQ8WOFU3RyjK
-            client-secret: 59aa60b6ed40b30306e89c8b59cbfa7ddd622922
+            client-id:
+            client-secret:
             scope: user:email
             redirect-uri: "{baseUrl}/login/oauth2/code/github"
             client-name: GitHub
+
+          google:  # ? Google ?? ??
+            client-id:
+            client-secret:   # ? ??? ?? ???? ??
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - profile
+              - email
+            client-name: Google
         provider:
           github:
             authorization-uri: https://github.com/login/oauth/authorize
             token-uri: https://github.com/login/oauth/access_token
             user-info-uri: https://api.github.com/user
+          google:  # ? Google provider ??
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub  # Google?? ?? ID? "sub"
 
 mybatis:
   type-aliases-package: org.example.vo
@@ -42,5 +56,3 @@ logging:
   level:
     org.mybatis: DEBUG
     org.example.repository: DEBUG
-
-
